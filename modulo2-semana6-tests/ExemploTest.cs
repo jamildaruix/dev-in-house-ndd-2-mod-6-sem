@@ -31,7 +31,7 @@ public class ExemploTest
         stringBuilder!.AppendLine("AULA 01");
         stringBuilder!.AppendLine($"DATA E HORA {DateTime.Now}");
 
-        var file = $@"MUDAR-O-DIRETORIO\Aula-{DateTime.Now.ToString("HHmmss")}.txt";
+        var file = $@"D:\dev-in-house\Aula-01\Aula-{DateTime.Now.ToString("HHmmss")}.txt";
         string mensagem = "";
 
         // Escrever o arquivo
@@ -50,7 +50,7 @@ public class ExemploTest
             // Para simular Exception comentar as tres linhas 
             streamWriter.Flush();
             streamWriter.Close();
-            streamWriter = null;
+            //streamWriter = null;
 
             if (streamWriter != null)
             {
@@ -87,6 +87,43 @@ public class ExemploTest
 
         public CustomErrorException(string mensagemErro) : base(mensagemErro)
         {
+        }
+    }
+
+    [Theory]
+    [InlineData(1000.00)]
+    [InlineData(59999.99)]
+    [InlineData(3000.11)]
+    public void Calculo_Salario_Ate_Cinco_Mil_Reais_Sucesso(decimal salarioBruto)
+    {
+        Salario salario = new Salario(salarioBruto, 7.5M, 0);
+
+        bool condicao = salario.CalcularSalarioLiquido() < 5000M;
+        string mensagemErro = "Erro ao efeutar o cálculo";
+        Assert.True(condicao, mensagemErro);
+    }
+
+    [Fact]
+    public void Calculo_Salario_Liquido_Zero_Erro()
+    {
+    }
+
+    public class Salario
+    {
+        public Salario(decimal bruto, decimal inss, decimal ir)
+        {
+            Bruto = bruto;
+            Inss = inss;
+            IR = ir;
+        }
+
+        public decimal Bruto { get; set; }
+        public decimal  Inss { get; set; }
+        public decimal IR { get; set; }
+
+        public decimal CalcularSalarioLiquido()
+        {
+            return Bruto;
         }
     }
 
