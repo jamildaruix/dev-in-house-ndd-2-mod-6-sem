@@ -1,10 +1,10 @@
-using System.Data.SqlClient;
 using System.Text;
 
 namespace modulo2_semana6_tests;
 
-public class ExemploTest
+public class ExemploTest : ConfiguracaoHostApi
 {
+  
     [Fact]
     public void Exemplo_Metodod_InputTrue_ReturnFalse()
     {
@@ -91,21 +91,45 @@ public class ExemploTest
     }
 
     [Theory]
-    [InlineData(1000.00)]
-    [InlineData(59999.99)]
-    [InlineData(3000.11)]
-    public void Calculo_Salario_Ate_Cinco_Mil_Reais_Sucesso(decimal salarioBruto)
+    [InlineData(1000.00, 7.0, 0)]
+    [InlineData(59999.99, 15.5, 27.7)]
+    [InlineData(3000.11, 8.5, 2.5)]
+    public void Calculo_Salario_Ate_Cinco_Mil_Reais_Sucesso(decimal salarioBruto, decimal inss, decimal ir)
     {
-        Salario salario = new Salario(salarioBruto, 7.5M, 0);
+        Salario salario = new Salario(salarioBruto, inss, ir);
 
         bool condicao = salario.CalcularSalarioLiquido() < 5000M;
         string mensagemErro = "Erro ao efeutar o cálculo";
+
+        Assert.NotNull(salario);
         Assert.True(condicao, mensagemErro);
+        Assert.Equal("expectativa", "conteudo atual");
+        Assert.False(condicao == true, mensagemErro);
+        Assert.NotEqual("expectativa", "conteudo atual");
     }
 
-    [Fact]
-    public void Calculo_Salario_Liquido_Zero_Erro()
+    [Theory]
+    [InlineData(500)]
+    public async Task Consumir_Api_Exemplo_Com_Valor_Maior_Que_10_Sucesso(int valor)
     {
+        var resultado = await client.GetAsync($"/ExemploTest/{valor}");
+        Assert.NotNull(resultado);
+
+        var responseApi = await resultado.Content.ReadAsStringAsync();
+        Assert.NotNull(responseApi);
+        Assert.Equal(responseApi, "O Retorno do Valor é maior que dez");
+    }
+
+    [Theory]
+    [InlineData(10)]
+    public async Task Consumir_Api_Exemplo_Com_Valor_Maior_Que_10_Erro(int valor)
+    {
+        var resultado = await client.GetAsync($"/ExemploTest/{valor}");
+        Assert.NotNull(resultado);
+
+        var responseApi = await resultado.Content.ReadAsStringAsync();
+        Assert.NotNull(responseApi);
+        Assert.NotEqual(responseApi, "O Retorno do Valor é maior que dez");
     }
 
     public class Salario
@@ -123,7 +147,13 @@ public class ExemploTest
 
         public decimal CalcularSalarioLiquido()
         {
-            return Bruto;
+            var liquido = Bruto;
+
+            if(IR > 0)
+            {
+            }
+            
+            return liquido;
         }
     }
 
