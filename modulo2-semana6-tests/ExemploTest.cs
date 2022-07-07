@@ -4,7 +4,40 @@ namespace modulo2_semana6_tests;
 
 public class ExemploTest : ConfiguracaoHostApi
 {
-  
+    [Theory]
+    [InlineData(500)]
+    public void Consumir_Api_Exemplo_Com_Valor_Maior_Que_10_Sucesso(int valor)
+    {
+        var resultado = client.GetAsync($"/ExemploTest/{valor}").GetAwaiter().GetResult();
+        Assert.NotNull(resultado);
+
+        var responseApi = resultado.Content.ReadAsStringAsync().GetAwaiter().GetResult();
+        Assert.NotNull(responseApi);
+        Assert.Equal("O Retorno do Valor é maior que dez", responseApi);
+    }
+
+    [Theory]
+    [InlineData(10)]
+    public async Task Consumir_Api_Exemplo_Com_Valor_Maior_Que_10_Erro(int valor)
+    {
+        var resultado = await client.GetAsync($"/ExemploTest/{valor}");
+        Assert.NotNull(resultado);
+
+        var responseApi = await resultado.Content.ReadAsStringAsync();
+        Assert.NotNull(responseApi);
+        Assert.Equal("O Retorno do Valor é menor que dez", responseApi);
+        Assert.NotEqual("O Retorno do Valor é maior que dez", responseApi);
+    }
+
+    [Fact]
+    public void Gravar_Dados_Na_Tabela_Inscricao_Sucesso()
+    {
+        //Validar Dados
+        Salario salario = new Salario(1,1,1);
+        Assert.NotEqual(0, salario.Id);
+    }
+
+
     [Fact]
     public void Exemplo_Metodod_InputTrue_ReturnFalse()
     {
@@ -108,30 +141,6 @@ public class ExemploTest : ConfiguracaoHostApi
         Assert.NotEqual("expectativa", "conteudo atual");
     }
 
-    [Theory]
-    [InlineData(500)]
-    public async Task Consumir_Api_Exemplo_Com_Valor_Maior_Que_10_Sucesso(int valor)
-    {
-        var resultado = await client.GetAsync($"/ExemploTest/{valor}");
-        Assert.NotNull(resultado);
-
-        var responseApi = await resultado.Content.ReadAsStringAsync();
-        Assert.NotNull(responseApi);
-        Assert.Equal(responseApi, "O Retorno do Valor é maior que dez");
-    }
-
-    [Theory]
-    [InlineData(10)]
-    public async Task Consumir_Api_Exemplo_Com_Valor_Maior_Que_10_Erro(int valor)
-    {
-        var resultado = await client.GetAsync($"/ExemploTest/{valor}");
-        Assert.NotNull(resultado);
-
-        var responseApi = await resultado.Content.ReadAsStringAsync();
-        Assert.NotNull(responseApi);
-        Assert.NotEqual(responseApi, "O Retorno do Valor é maior que dez");
-    }
-
     public class Salario
     {
         public Salario(decimal bruto, decimal inss, decimal ir)
@@ -140,6 +149,8 @@ public class ExemploTest : ConfiguracaoHostApi
             Inss = inss;
             IR = ir;
         }
+
+        public int Id { get; set; }
 
         public decimal Bruto { get; set; }
         public decimal  Inss { get; set; }
